@@ -3,7 +3,7 @@ const SESSION_ID = 4
 
 
 
-const cloneSection = document.querySelector('.clone-this-section')
+const cloneSection = document.getElementById('clone-this-section')
 
 
 // Checks user session and change accordingly
@@ -19,7 +19,7 @@ const user_session = () => {
                 const thisStyle = window.getComputedStyle(buttonReply)
                 if (thisStyle.display !== 'none') {
                     buttonReply.style.display = 'none'
-                    const cloneElement = document.querySelector('.useroptions-container').cloneNode(true)
+                    const cloneElement = cloneSection.content.querySelector('.useroptions-container').cloneNode(true)
                     const container = buttonReply.parentNode
                     const buttonsClone = Array.from(cloneElement.childNodes)
                     buttonsClone.forEach(button => {
@@ -33,7 +33,7 @@ const user_session = () => {
 
 // Create a comment card
 const createCommentCard = (dataComment) => {
-    const commentCard = cloneSection.querySelector('.comment-card').cloneNode(true)
+    const commentCard = cloneSection.content.querySelector('.comment-card').cloneNode(true)
     commentCard.dataset.userid = dataComment.id
     commentCard.querySelector('[data-upvotes]').textContent = dataComment.score
     commentCard.querySelector('[data-user-avatar]').src = dataComment.user.image.webp
@@ -74,7 +74,7 @@ const createComment = (dataComment) => {
     }
 }
 
-
+// Fetch data.json on the same directory
 document.addEventListener('DOMContentLoaded', () => {
     fetch('data.json')
         .then(response => {
@@ -96,3 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 
+// When user replies to an existing comment
+// Using event delegation, trace user id and create reply container
+commentSection.addEventListener('click', event => {
+    // If target is reply button
+    if(event.target.classList.contains('reply')){
+        const commentParent = event.target.closest('[data-userID]')
+        const parentComment = commentParent.closest('article')
+
+        // If there is an active reply container
+        console.log(commentParent.parentNode.querySelector('.userinput'))
+        if(!commentParent.parentNode.querySelector('.userinput')){
+            // Create a reply container
+            const replyContainer = cloneSection.content.querySelector('.userinput').cloneNode(true)
+    
+            // Get username
+            const parentUsername = commentParent.querySelector('[data-username]').textContent
+            replyContainer.getElementsByTagName('textArea')[0].value = `@${parentUsername} `
+            console.log(replyContainer.getElementsByTagName('textArea')[0].value)
+    
+            // If it is a reply to a reply
+            if(commentParent.parentNode.classList.contains('replies-to-parent')){
+                commentParent.parentNode.insertBefore(replyContainer, commentParent.nextElementSibling)
+            }
+            else{
+                parentComment.insertBefore(replyContainer, commentParent.nextElementSibling)
+            }
+        }
+
+        
+    }
+})

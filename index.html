@@ -21,7 +21,7 @@
 
 <body>
     <section class="comment-section-container">
-        <article class="comment-container">
+        <!-- <article class="comment-container">
             <div class="comment-card" data-userID="1">
                 <div class="vote-container">
                     <button>
@@ -64,6 +64,13 @@
                             breakpoints works really well.</p>
                     </div>
                 </div>
+            </div>
+            <div class="userinput">
+                <div class="userinput-avatar">
+                    <img src="images/avatars/image-juliusomo.webp">
+                </div>
+                <textarea placeholder="Add a comment.."></textarea>
+                <button>SEND</button>
             </div>
         </article>
         <article class="comment-container">
@@ -156,6 +163,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="userinput">
+                    <div class="userinput-avatar">
+                        <img src="images/avatars/image-juliusomo.webp">
+                    </div>
+                    <textarea placeholder="Add a comment.."></textarea>
+                    <button>SEND</button>
+                </div>
                 <div class="comment-card" data-userID="4">
                     <div class="vote-container">
                         <button>
@@ -201,7 +215,7 @@
                     </div>
                 </div>
             </div>
-        </article>
+        </article> -->
 
         <div class="userinput">
             <div class="userinput-avatar">
@@ -213,7 +227,14 @@
     </section>
 
 
-    <section class='clone-this-section'>
+    <template id='clone-this-section'>
+        <div class="userinput">
+            <div class="userinput-avatar">
+                <img src="images/avatars/image-juliusomo.webp">
+            </div>
+            <textarea placeholder="Add a comment.."></textarea>
+            <button>SEND</button>
+        </div>
         <div class="comment-card">
             <div class="vote-container">
                 <button>
@@ -274,9 +295,7 @@
                 Edit
             </button>
         </div>
-    </section>
-
-    <!-- Pull dynamic content from the data.json file -->
+    </template>
 
     <div class="attribution">
         Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>.

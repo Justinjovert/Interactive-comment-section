@@ -26,7 +26,6 @@ body {
 
 .comment-container {
     width: min(90%, 780px);
-    /* background-color: red; */
     position: relative;
 }
 
@@ -186,11 +185,12 @@ body {
     display: flex;
     padding: 20px;
     height: auto;
-    width: min(90%, 780px);
+    width: min(100%, 780px);
     box-sizing: border-box;
     border-radius: 5px;
     align-items: start;
     background-color: white;
+    margin: 1rem 0;
 }
 
 .userinput-avatar {
