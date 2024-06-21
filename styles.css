@@ -92,17 +92,19 @@ body {
     display: flex;
     flex-direction: column;
     margin-left: 2rem;
+    flex: 1;
+}
+
+
+.user-details {
+    display: flex;
+    align-items: center;
 }
 
 .user-details>span {
     margin-left: 1rem;
     font-weight: 400;
     color: var(--neutral-grayish-blue);
-}
-
-.user-details {
-    display: flex;
-    align-items: center;
 }
 
 .user-details>a {
@@ -150,7 +152,8 @@ body {
 .delete-reply {
     color: var(--primary-soft-red);
 }
-.delete-reply:hover{
+
+.delete-reply:hover {
     background-color: hsl(353, 100%, 98%);
 }
 
@@ -165,12 +168,13 @@ body {
     background-color: rgb(233, 251, 255);
 }
 
-.edit-reply, .reply-to {
+.edit-reply,
+.reply-to {
     font-weight: 700;
     color: var(--primary-moderate-blue);
 }
 
-.comment > p{
+.comment>p {
     display: inline;
 }
 
@@ -252,6 +256,6 @@ body {
 
 
 
-.clone-this-section{
+.clone-this-section {
     display: none;
 }
