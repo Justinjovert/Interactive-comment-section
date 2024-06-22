@@ -149,11 +149,21 @@ const createDataObj = (thisUserinput) => {
             },
             replies: []
         }
-        console.log(object.user.image.webp)
+        console.log(object)
         const commentCard = createCommentCard(object)
         return commentCard
     }
 }
+
+
+// Create a vote system function
+// Upvote or downvote
+// Click vote again to remove vote
+const voteSystem = () => {
+
+}
+
+
 
 // When user replies to an existing comment
 // Using event delegation, trace user id and create reply container
@@ -185,7 +195,7 @@ commentSection.addEventListener('click', event => {
     }
 
     // If target is SEND button
-    // Posting a comment / reply
+    // Posting a comment/reply
     if (event.target.tagName === 'BUTTON' && event.target.parentNode.classList.contains('userinput')) {
         if (event.target.id == 'newComment') {
             // Extract data
@@ -201,28 +211,90 @@ commentSection.addEventListener('click', event => {
                 newCommentContainer.appendChild(comment)
                 commentSection.insertBefore(newCommentContainer, userinput)
             }
-            console.log('New comment')
         }
         else {
             // Look for parent comment ID, add object in reply array
             const parentID = event.target.closest('.userinput').dataset.parentid
             const dataID = `[data-id="${parentID}"]`
-            //const replyContainer = document.querySelector(dataID).parentNode.querySelector('.replies-to-parent')
+
+            // Trace back to article and search for element there
             const thisUserInput = event.target.closest('.userinput')
             const parentCommentContainer = thisUserInput.closest('.comment-container')
             let replyContainer = parentCommentContainer.querySelector('.replies-to-parent')
+
             // Create reply container if it doesn't exist
             if (replyContainer === null) {
                 parentCommentContainer.insertAdjacentHTML('beforeend', '<div class = "replies-to-parent"><div class="line"></div></div>')
                 replyContainer = parentCommentContainer.querySelector('.replies-to-parent')
             }
             replyContainer.appendChild(createDataObj(thisUserInput))
-            console.log('New reply')
             thisUserInput.remove()  // Remove reply container 
         }
     }
+
+    // Vote system
+    if (event.target.parentNode.dataset.hasOwnProperty('vote')) {
+        const vote = event.target
+        const upvotesLabel = vote.closest('[data-vote]').querySelector('[data-upvotes]')
+        // If it is the vote button container
+        if (vote.dataset.hasOwnProperty('upvote')) {
+            // Selects all buttons and check if there is an active vote
+            const activeButtons = vote.closest('[data-vote]').querySelectorAll('button')
+            let activeVote = false
+            activeButtons.forEach(button => {
+                if(button.classList.contains('voted-active')){
+                    activeVote = button
+                    return
+                }
+            })
+            console.log(activeVote)
+            // If it has not yet been voted
+            // Vote and add class active class
+            if( activeVote === false ){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) + 1
+                vote.classList.add('voted-active')
+            }
+            // If there is already a vote casted
+            // Find the active class first, condition if the target is the same active, : 0 ? -2
+            else if(vote === activeVote){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) - 1
+                activeVote.classList.remove('voted-active')
+            }
+            // If opposite vote is clicked
+            else if(activeVote === vote.closest('[data-vote]').querySelector('[data-downvote]')){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) + 2
+                activeVote.classList.remove('voted-active')
+                vote.classList.add('voted-active')
+            }
+            
+        }
+        else if (vote.dataset.hasOwnProperty('downvote')) {
+            const activeButtons = vote.closest('[data-vote]').querySelectorAll('button')
+            let activeVote = false
+            activeButtons.forEach(button => {
+                if(button.classList.contains('voted-active')){
+                    activeVote = button
+                    return
+                }
+            })
+            if( activeVote === false ){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) - 1
+                vote.classList.add('voted-active')
+            }
+            else if(vote === activeVote){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) + 1
+                activeVote.classList.remove('voted-active')
+            }
+            // If opposite vote is clicked
+            else if(activeVote === vote.closest('[data-vote]').querySelector('[data-upvote]')){
+                upvotesLabel.textContent = Number(upvotesLabel.textContent) - 2
+                activeVote.classList.remove('voted-active')
+                vote.classList.add('voted-active')
+            }
+        }
+    }
+
     user_session()
 })
-
 
 

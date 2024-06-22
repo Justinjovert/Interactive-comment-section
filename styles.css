@@ -87,6 +87,12 @@ body {
     padding: 10px 0;
     cursor: pointer;
 }
+.voted-active path{
+    fill: #191dff;
+}
+.vote-container svg{
+    pointer-events: none;
+}
 
 .comment-details {
     display: flex;
