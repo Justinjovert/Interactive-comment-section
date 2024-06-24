@@ -76,6 +76,7 @@ body {
 
 .vote-container>label {
     font-weight: 500;
+    min-width: 20px;
     color: var(--primary-moderate-blue);
 }
 
@@ -140,7 +141,7 @@ body {
     margin-left: auto;
 }
 
-.comment-update-container>button {
+.comment-update-container>button, .cancel-button {
     margin-left: auto;
     border: 0;
     background-color: transparent;
@@ -153,6 +154,10 @@ body {
     align-items: center;
     padding: 10px;
     border-radius: 10px;
+}
+
+.useroptions-container svg {
+    pointer-events: none;
 }
 
 .delete-reply {
@@ -213,7 +218,7 @@ body {
     width: 100%;
 }
 
-.userinput>textarea {
+.userinput-textarea{
     margin-left: 2rem;
     margin-right: 2rem;
     flex: 1;
@@ -228,17 +233,19 @@ body {
     letter-spacing: 1px;
     overflow-y: auto;
     resize: none;
+    font-weight: 100;
+    width: 100%;
 }
 
-.userinput>textarea::placeholder {
+.userinput-textarea::placeholder {
     font-family: "Rubik";
 }
 
-.userinput>textarea:focus {
+.userinput-textarea:focus {
     outline: none;
 }
 
-.userinput>button {
+.userinput-button {
     border-radius: 10px;
     padding: 15px;
     height: auto;
@@ -248,6 +255,16 @@ body {
     font-weight: 700;
     font-size: 16px;
     cursor: pointer;
+}
+.userinput-button:hover{
+    background-color: var(--primary-light-grayish-blue);
+}
+
+.container-for-buttons{
+    display: flex;
+    margin-left: auto;
+    margin-top: 10px;
+    gap: 10px;
 }
 
 .attribution {

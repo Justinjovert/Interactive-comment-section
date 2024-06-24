@@ -40,6 +40,10 @@ const createCommentCard = (dataComment) => {
     commentCard.querySelector('[data-username]').textContent = dataComment.user.username
     commentCard.querySelector('[data-timestomp]').textContent = dataComment.createdAt
     commentCard.querySelector('[data-comment-content]').textContent = dataComment.content
+    // If it a reply comment
+    if (dataComment.replyingTo) {
+        commentCard.querySelector('[data-replyParent]').innerHTML = `@${dataComment.replyingTo}`
+    }
     return commentCard
 }
 
@@ -147,20 +151,18 @@ const createDataObj = (thisUserinput) => {
                 },
                 "username": currentUsername
             },
-            replies: []
         }
-        console.log(object)
+        if (thisUserinput.dataset.hasOwnProperty('parentusername')) {
+            // It's a reply
+            object.replyingTo = thisUserinput.dataset.parentusername
+        }
+        else {
+            // It is a unique comment
+            object.replies = []
+        }
         const commentCard = createCommentCard(object)
         return commentCard
     }
-}
-
-
-// Create a vote system function
-// Upvote or downvote
-// Click vote again to remove vote
-const voteSystem = () => {
-
 }
 
 
@@ -183,6 +185,7 @@ commentSection.addEventListener('click', event => {
             const parentUsername = commentParent.querySelector('[data-username]').textContent
             replyContainer.getElementsByTagName('textArea')[0].value = `@${parentUsername} `
             replyContainer.dataset.parentid = parentID
+            replyContainer.dataset.parentusername = parentUsername
 
             // If it is a reply to a reply
             if (commentParent.parentNode.classList.contains('replies-to-parent')) {
@@ -227,6 +230,8 @@ commentSection.addEventListener('click', event => {
                 parentCommentContainer.insertAdjacentHTML('beforeend', '<div class = "replies-to-parent"><div class="line"></div></div>')
                 replyContainer = parentCommentContainer.querySelector('.replies-to-parent')
             }
+            // Remove @username after sending button
+            thisUserInput.querySelector("textarea").value = thisUserInput.querySelector("textarea").value.split(' ').slice(1).join(' ')
             replyContainer.appendChild(createDataObj(thisUserInput))
             thisUserInput.remove()  // Remove reply container 
         }
@@ -242,57 +247,158 @@ commentSection.addEventListener('click', event => {
             const activeButtons = vote.closest('[data-vote]').querySelectorAll('button')
             let activeVote = false
             activeButtons.forEach(button => {
-                if(button.classList.contains('voted-active')){
+                if (button.classList.contains('voted-active')) {
                     activeVote = button
                     return
                 }
             })
-            console.log(activeVote)
             // If it has not yet been voted
             // Vote and add class active class
-            if( activeVote === false ){
+            if (activeVote === false) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) + 1
                 vote.classList.add('voted-active')
             }
             // If there is already a vote casted
             // Find the active class first, condition if the target is the same active, : 0 ? -2
-            else if(vote === activeVote){
+            else if (vote === activeVote) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) - 1
                 activeVote.classList.remove('voted-active')
             }
             // If opposite vote is clicked
-            else if(activeVote === vote.closest('[data-vote]').querySelector('[data-downvote]')){
+            else if (activeVote === vote.closest('[data-vote]').querySelector('[data-downvote]')) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) + 2
                 activeVote.classList.remove('voted-active')
                 vote.classList.add('voted-active')
             }
-            
+
         }
         else if (vote.dataset.hasOwnProperty('downvote')) {
             const activeButtons = vote.closest('[data-vote]').querySelectorAll('button')
             let activeVote = false
             activeButtons.forEach(button => {
-                if(button.classList.contains('voted-active')){
+                if (button.classList.contains('voted-active')) {
                     activeVote = button
                     return
                 }
             })
-            if( activeVote === false ){
+            if (activeVote === false) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) - 1
                 vote.classList.add('voted-active')
             }
-            else if(vote === activeVote){
+            else if (vote === activeVote) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) + 1
                 activeVote.classList.remove('voted-active')
             }
             // If opposite vote is clicked
-            else if(activeVote === vote.closest('[data-vote]').querySelector('[data-upvote]')){
+            else if (activeVote === vote.closest('[data-vote]').querySelector('[data-upvote]')) {
                 upvotesLabel.textContent = Number(upvotesLabel.textContent) - 2
                 activeVote.classList.remove('voted-active')
                 vote.classList.add('voted-active')
             }
         }
     }
+
+    // If delete/reply button
+    if (event.target.parentNode.classList.contains('comment-update-container')) {
+        const buttonTarget = event.target
+        if (buttonTarget.classList.contains('delete-reply') && buttonTarget.id === 'delete-comment') {
+            const thisComment = buttonTarget.closest('.comment-card')
+            thisComment.remove()
+        }
+
+        // If edit
+        if (buttonTarget.classList.contains('edit-reply')) {
+            // If editing, disable 'EDIT' and 'DELETE' buttons
+            Array.from(buttonTarget.parentNode.children).forEach(button => {
+                if (button.classList.contains('edit-reply') || button.classList.contains('delete-reply')) {
+                    button.disabled = true
+                    button.style.cursor = 'not-allowed'
+                    button.style.opacity = "50%"
+                }
+            })
+            const thisComment = buttonTarget.closest('.comment-card').querySelector('.comment')
+            let commentContent
+            Array.from(thisComment.children).forEach(child => {
+                child.style.display = 'none'
+                if (child.classList.contains('comment-content')) {
+                    commentContent = child.textContent
+                }
+            })
+
+            // Checks if all comment children is indeed hidden
+            let allChildrenHidden = Array.from(thisComment.children).every(child => child.style.display === 'none')
+            if (allChildrenHidden) {
+                // Create a textarea tag
+                // Copy comment content value
+                const createTextArea = document.createElement('textarea')
+                createTextArea.value = commentContent
+                createTextArea.classList.add('userinput-textarea')
+                thisComment.appendChild(createTextArea)
+
+                // Create a container for both buttons
+                const containerForButtons = document.createElement('div')
+                containerForButtons.classList.add('container-for-buttons')
+                thisComment.appendChild(containerForButtons)
+
+                // Creating a cancel button
+                const cancelButton = document.createElement('button')
+                cancelButton.textContent = 'Cancel'
+                cancelButton.id = 'cancelButton'
+                cancelButton.classList.add('delete-reply', 'cancel-button')
+                containerForButtons.appendChild(cancelButton)
+
+
+                // Creating an update button
+                const updateButton = document.createElement('button')
+                updateButton.textContent = 'UPDATE'
+                updateButton.id = 'updateButton'
+                updateButton.classList.add('userinput-button')
+                containerForButtons.appendChild(updateButton)
+
+            }
+        }
+
+    }
+    // If update button or cancel button
+    if (event.target.parentNode.classList.contains('container-for-buttons') && event.target.tagName === 'BUTTON') {
+        const buttonTarget = event.target
+        const enableButtons = buttonTarget.closest('.comment-card').querySelector('.comment-update-container')
+        // Enable disabled buttons when reply container is canceled/updated
+        Array.from(enableButtons.children).forEach(button => {
+            button.disabled = false
+            button.style.cursor = ''
+            button.style.opacity = "100%"
+        })
+        // If update button
+        if(buttonTarget.id == 'updateButton'){
+            const userinput = buttonTarget.closest('.comment').querySelector('textArea')
+            Array.from(buttonTarget.closest('.comment').children).forEach(p => {
+                if (p.tagName === 'P') {
+                    p.style.display = 'inline'
+                    if (p.classList.contains('comment-content')) {
+                        p.textContent = userinput.value
+                    }
+                }
+                if (p.tagName === 'TEXTAREA') {
+                    p.remove()
+                }
+            })
+        }
+        else if(buttonTarget.id == 'cancelButton'){
+            Array.from(buttonTarget.closest('.comment').children).forEach(p => {
+                if (p.tagName === 'P') {
+                    p.style.display = 'inline'
+                }
+                if (p.tagName === 'TEXTAREA') {
+                    p.remove()
+                }
+            })
+        }
+
+        buttonTarget.parentNode.remove()
+    }
+
+
 
     user_session()
 })
