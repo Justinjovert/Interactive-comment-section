@@ -37,22 +37,22 @@ Users should be able to:
 
 - Built a <template> for the comments and other containers like for useroptions <button>. Grab a template whenever it satisfies a condition.
 
-### Built with
+## Built with
 
 - Semantic HTML5 markup
 - CSS custom properties
 
-### What I learned
+## What I learned
 
 - First time I learned <template>. On my previous works, I would just set the elements with "display: none", and clone that element but its selected for when <querySelector> is used. With <template>, I do not need to worry about such problems.
 
 
-### Continued development
+## Continued development
 
 Unfortunately I've ran out of motivation on doing this project. I finished what I could finish and I just want to move to another project. 
 
 
-### Useful resources
+## Useful resources
 
 - [Asaeneh's 30 Day of JavaScript](https://github.com/Asabeneh/30-Days-Of-JavaScript)
 
