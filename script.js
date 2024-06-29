@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             comments.forEach(dataComment => {
                 createComment(dataComment)
             })
+            console.table(comments)
+            localStorage.setItem('comments', JSON.stringify(comments));
             user_session()
         })
         .catch(error => {
@@ -167,9 +169,44 @@ const createDataObj = (thisUserinput) => {
 
 
 
+// Are you sure you want do delete?
+const deleteComment = () => {
+    return new Promise((resolve) => {
+
+        const overlay = document.querySelector('.overlay')
+        const deleteModal = document.querySelector('.delete-modal')
+
+        overlay.style.display = 'block'
+        deleteModal.style.display = 'block'
+
+        let choice = false
+
+        const closeModal = (choice) => {
+            overlay.style.display = 'none';
+            deleteModal.style.display = 'none';
+            resolve(choice);
+        }
+
+        overlay.addEventListener('click', () => {
+            closeModal(false)
+        }, { once: true })
+
+        deleteModal.addEventListener('click', event => {
+            if (event.target.classList.contains('modal-cancel')) {
+                closeModal(false)
+            }
+            else if (event.target.classList.contains('modal-delete')) {
+                closeModal(true)
+            }
+        }, {once: true})
+    })
+}
+
+
+
 // When user replies to an existing comment
 // Using event delegation, trace user id and create reply container
-commentSection.addEventListener('click', event => {
+commentSection.addEventListener('click', async event => {
     // If target is reply button
     if (event.target.classList.contains('reply')) {
         const commentParent = event.target.closest('[data-id]')
@@ -303,7 +340,10 @@ commentSection.addEventListener('click', event => {
         const buttonTarget = event.target
         if (buttonTarget.classList.contains('delete-reply') && buttonTarget.id === 'delete-comment') {
             const thisComment = buttonTarget.closest('.comment-card')
-            thisComment.remove()
+            const choice = await deleteComment()
+            if(choice){
+                thisComment.remove()
+            }
         }
 
         // If edit
@@ -370,7 +410,7 @@ commentSection.addEventListener('click', event => {
             button.style.opacity = "100%"
         })
         // If update button
-        if(buttonTarget.id == 'updateButton'){
+        if (buttonTarget.id == 'updateButton') {
             const userinput = buttonTarget.closest('.comment').querySelector('textArea')
             Array.from(buttonTarget.closest('.comment').children).forEach(p => {
                 if (p.tagName === 'P') {
@@ -384,7 +424,7 @@ commentSection.addEventListener('click', event => {
                 }
             })
         }
-        else if(buttonTarget.id == 'cancelButton'){
+        else if (buttonTarget.id == 'cancelButton') {
             Array.from(buttonTarget.closest('.comment').children).forEach(p => {
                 if (p.tagName === 'P') {
                     p.style.display = 'inline'
@@ -398,9 +438,64 @@ commentSection.addEventListener('click', event => {
         buttonTarget.parentNode.remove()
     }
 
+    // For when the line is clicked
+    // User wants to hide or show replies
+    if (event.target.classList.contains('line')) {
+        const replies = event.target.parentNode
+        const line = Array.from(replies.children)[0]
+        Array.from(replies.children).forEach(element => {
+            element.style.display = 'none'
+        })
+        line.style.display = 'block'    // Line set to 'block' always
 
+        // Create a button 'Show replies'
+        const showReply = document.createElement('button')
+        showReply.classList.add('show-replies')
+
+        // Number of replies
+        const repliesLength = replies.children.length - 1   // Exclude line
+        console.log(repliesLength)
+        showReply.textContent = repliesLength > 1
+            ? `Show ${repliesLength} replies`
+            : 'Show 1 reply'
+
+        replies.appendChild(showReply)
+        line.style.pointerEvents = 'none';
+    }
+
+    // Show replies
+    if (event.target.classList.contains('show-replies')) {
+        const replies = event.target.parentNode
+        Array.from(replies.children).forEach(element => {
+            element.style.display = 'flex'
+        })
+        const line = Array.from(replies.children)[0]
+        line.style.pointerEvents = 'auto';
+        event.target.remove()
+    }
 
     user_session()
 })
 
 
+
+
+// Update JSON everytime comment section is updated
+const updateJSON = () => {
+    fetch('data.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("404 Data not found!")
+            }
+            return response.json()
+        })
+        .then(data => {
+            console.table(data.comments)
+        })
+        .catch(error => {
+            console.error("404 Data not found!", error)
+        })
+}
+
+
+updateJSON()
